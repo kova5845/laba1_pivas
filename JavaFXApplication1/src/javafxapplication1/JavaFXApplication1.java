@@ -6,6 +6,7 @@
 package javafxapplication1;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -27,6 +28,14 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -43,8 +52,8 @@ public class JavaFXApplication1 extends Application {
         
         TextField textField1 = new TextField();
         ComboBox<String> comboBox1 = new ComboBox<String>();
-        Button button1 = new Button("Add");
-        button1.setOnAction(new EventHandler<ActionEvent>() {
+        Button buttonCombo = new Button("Add");
+        buttonCombo.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
@@ -78,27 +87,27 @@ public class JavaFXApplication1 extends Application {
             
         });
         TextField textField2 = new TextField();
-        Button button3 = new Button("Add");
-        Button button2 = new Button("Swap");
-        button2.setOnAction(new EventHandler<ActionEvent>() {
+        Button buttonSwap = new Button();
+        Button buttonRename = new Button();
+        buttonRename.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
                String s = textField2.getText();
                if(!s.equals("")){
-                button3.setText(s);
+                buttonSwap.setText(s);
                }
                textField2.clear();
             }
         });
-        button3.setOnAction(new EventHandler<ActionEvent>() {
+        buttonSwap.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
                 
-                String s = button2.getText();
-                button2.setText(button3.getText());
-                button3.setText(s);
+                String s = buttonRename.getText();
+                buttonRename.setText(buttonSwap.getText());
+                buttonSwap.setText(s);
             }
         });
         TextField textField3 = new TextField();
@@ -109,8 +118,8 @@ public class JavaFXApplication1 extends Application {
         radioButton1.setToggleGroup(group);
         radioButton2.setToggleGroup(group);
         radioButton3.setToggleGroup(group);
-        Button button4 = new Button("Choice");
-        button4.setOnAction(new EventHandler<ActionEvent>() {
+        Button buttonRadio = new Button("Choice");
+        buttonRadio.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
@@ -142,8 +151,8 @@ public class JavaFXApplication1 extends Application {
         CheckBox checkBox1 = new CheckBox(ONE);
         CheckBox checkBox2 = new CheckBox(TWO);
         CheckBox checkBox3 = new CheckBox(THREE);
-        Button button5 = new Button("Choice");
-        button5.setOnAction(new EventHandler<ActionEvent>() {
+        Button buttonCheck = new Button("Choice");
+        buttonCheck.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
@@ -199,8 +208,8 @@ public class JavaFXApplication1 extends Application {
         tableView1.setItems(data);
         tableView1.getColumns().addAll(tableColumn1, tableColumn2);
         
-        Button button6 = new Button("Add");
-        button6.setOnAction(new EventHandler<ActionEvent>() {
+        Button buttonAdd = new Button("Add");
+        buttonAdd.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
@@ -216,8 +225,8 @@ public class JavaFXApplication1 extends Application {
         });
         
         
-        Button button7 = new Button("To second");
-        button7.setOnAction(new EventHandler<ActionEvent>() {
+        Button buttonToSecond = new Button("To second");
+        buttonToSecond.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
@@ -232,8 +241,8 @@ public class JavaFXApplication1 extends Application {
             }
         });
         
-        Button button8 = new Button("To first");
-        button8.setOnAction(new EventHandler<ActionEvent>() {
+        Button buttonToFirst = new Button("To first");
+        buttonToFirst.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
@@ -250,19 +259,19 @@ public class JavaFXApplication1 extends Application {
         
         VBox vBox1 = new VBox(20);
         VBox vBox2 = new VBox(10);
-        vBox2.getChildren().addAll(textField5, button6, button7, button8);
+        vBox2.getChildren().addAll(textField5, buttonAdd, buttonToSecond, buttonToFirst);
         FlowPane flowPane1 = new FlowPane(20, 5);
         FlowPane flowPane2 = new FlowPane(20, 5);
         FlowPane flowPane3 = new FlowPane(20, 5);
         FlowPane flowPane4 = new FlowPane(20, 5);
         FlowPane flowPane5 = new FlowPane(20, 5);
         
-        flowPane1.getChildren().addAll(textField1, button1, comboBox1);
-        flowPane2.getChildren().addAll(textField2, button2, button3);
+        flowPane1.getChildren().addAll(textField1, buttonCombo, comboBox1);
+        flowPane2.getChildren().addAll(textField2, buttonRename, buttonSwap);
         flowPane3.getChildren().addAll(textField3, radioButton1, radioButton2, 
-                                       radioButton3, button4);
+                                       radioButton3, buttonRadio);
         flowPane4.getChildren().addAll(textField4, checkBox1, checkBox2, 
-                                       checkBox3, button5);
+                                       checkBox3, buttonCheck);
         flowPane5.getChildren().addAll(tableView1, vBox2);
         
         flowPane1.setAlignment(Pos.CENTER);
@@ -281,6 +290,36 @@ public class JavaFXApplication1 extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         
+        
+        ChangePane thread = new ChangePane(vBox1);
+        Thread th = new Thread(thread);
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>(){
+            @Override
+            public void handle(KeyEvent key){
+                if(key.getCode().equals(KeyCode.R)){
+                    System.out.println("run");
+                    
+                        if(th.getState() == Thread.State.WAITING)
+                            thread.setFlag(false);
+                        else if(!th.isAlive()){
+                                th.start();
+                             }
+                }
+                if(key.getCode().equals(KeyCode.S)){
+                    System.out.println("stop");
+                    thread.setFlag(true);
+                }
+            }
+        });
+        
+    primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+        @Override
+        public void handle(WindowEvent t) {
+            Platform.exit();
+            System.exit(0);
+        }
+    });
+    
 }
 
     /**
@@ -291,7 +330,119 @@ public class JavaFXApplication1 extends Application {
     }
     
     
-    public static class Person {
+
+class ChangePane implements Runnable {
+    
+    Object object = new Object();
+    boolean flag = false;
+    VBox vBox1 = new VBox();
+    FlowPane[] fl;
+    StackPane[] st;
+    BorderPane[] br;
+    GridPane[] gr;
+    TilePane[] tl;
+    ObservableList<Node> obs;
+    int i = 0;
+
+    ChangePane(VBox vBox1) {
+        
+        this.vBox1 = vBox1;
+        fl = new FlowPane[5];
+        st = new StackPane[5];
+        br = new BorderPane[5];
+        gr = new GridPane[5];
+        tl = new TilePane[5];
+        for(int i=0;i<5;i++){
+            fl[i] = new FlowPane();
+            st[i] = new StackPane();
+            br[i] = new BorderPane();
+            gr[i] = new GridPane();
+            tl[i] = new TilePane();
+        }
+    }
+    
+    @Override
+    public void run(){
+        
+        Runnable updater = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(i);
+                i %= vBox1.getChildren().size();
+                switch(i){
+                    case 0:
+                        for(int j = 0; j<vBox1.getChildren().size(); j++){
+                            fl[j] = (FlowPane) vBox1.getChildren().get(j);
+                            st[j].getChildren().addAll(fl[j].getChildren());
+                            vBox1.getChildren().remove(j);
+                            vBox1.getChildren().add(j, st[j]);
+                        }
+                        break;
+                    case 1:
+                        for(int j = 0; j<vBox1.getChildren().size(); j++){
+                            st[j] = (StackPane) vBox1.getChildren().get(j);
+                            br[j].getChildren().addAll(st[j].getChildren());
+                            vBox1.getChildren().remove(j);
+                            vBox1.getChildren().add(j, br[j]);
+                        }
+                        break;
+                    case 2:
+                        for(int j = 0; j<vBox1.getChildren().size(); j++){
+                            br[j] = (BorderPane) vBox1.getChildren().get(j);
+                            gr[j].getChildren().addAll(br[j].getChildren());
+                            vBox1.getChildren().remove(j);
+                            vBox1.getChildren().add(j, gr[j]);
+                        }
+                        break;
+                    case 3:
+                        for(int j = 0; j<vBox1.getChildren().size(); j++){
+                            gr[j] = (GridPane) vBox1.getChildren().get(j);
+                            tl[j].getChildren().addAll(gr[j].getChildren());
+                            vBox1.getChildren().remove(j);
+                            vBox1.getChildren().add(j, tl[j]);
+                        }
+                        break;
+                    case 4:
+                        for(int j = 0; j<vBox1.getChildren().size(); j++){
+                            tl[j] = (TilePane) vBox1.getChildren().get(j);
+                            fl[j].getChildren().addAll(tl[j].getChildren());
+                            vBox1.getChildren().remove(j);
+                            vBox1.getChildren().add(j, fl[j]);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                i++;
+            }
+        };
+        try{
+            while(true){
+                
+                Thread.sleep(2000);
+                synchronized(object){
+                    while(flag){
+                        object.wait();
+                    }
+                }
+                Platform.runLater(updater);
+            }
+        } catch(Exception e){
+            System.out.println(e);
+        }
+    }
+    
+    public void setFlag(boolean flag){
+        this.flag = flag;
+        if(!this.flag){
+            synchronized(object){
+                object.notifyAll();
+            }
+        }
+    }
+}
+
+public static class Person {
  
         private final SimpleStringProperty firstName;
         private final SimpleStringProperty lastName;
@@ -319,6 +470,3 @@ public class JavaFXApplication1 extends Application {
     }   
     
 }
-
-
-
